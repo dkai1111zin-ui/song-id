@@ -3,58 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - MusiceID</title>
+    <title>🎀 Admin Portal - MusiceID</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; background: radial-gradient(circle at top right, #1e1b4b, #020617); min-height: 100vh; }
-        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap');
+        
+        body { 
+            background-color: #fff5f7; 
+            color: #7d5a5a; 
+            font-family: 'Quicksand', sans-serif; 
+            background: linear-gradient(135deg, #fff5f7 0%, #fdf2f8 100%); 
+            min-height: 100vh; 
+        }
+
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.6); 
+            backdrop-filter: blur(12px); 
+            border: 2px solid rgba(255, 182, 193, 0.4); 
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.2);
+        }
+
         .hidden { display: none !important; }
-        .admin-list::-webkit-scrollbar { width: 4px; }
-        .admin-list::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.5); border-radius: 10px; }
+
+        .admin-list::-webkit-scrollbar { width: 6px; }
+        .admin-list::-webkit-scrollbar-track { background: #fff1f2; }
+        .admin-list::-webkit-scrollbar-thumb { background: #ffb6c1; border-radius: 10px; }
+
+        /* Style for the Upload Box */
+        .upload-box {
+            border: 2px dashed #ffb6c1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #fff;
+        }
+        .upload-box:hover {
+            background: #fff1f2;
+            border-color: #ff8da1;
+        }
+
+        input:focus { transform: translateY(-1px); }
+        .btn-hover { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .btn-hover:hover { transform: scale(1.02); }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center p-4">
 
     <!-- LOGIN UI -->
     <div id="loginSection" class="w-full max-w-sm">
-        <div class="glass-panel p-10 rounded-[2.5rem] text-center">
-            <i class="fa-solid fa-shield-halved text-blue-500 text-5xl mb-6"></i>
-            <h2 class="text-2xl font-bold mb-6">Staff Login</h2>
-            <input type="password" id="adminPass" placeholder="Enter Password" 
-                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 mb-4 focus:outline-none focus:border-blue-500 text-center text-white">
-            <button onclick="handleLogin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition">Login</button>
-            <a href="index.html" class="block mt-6 text-gray-500 text-sm">Return to Library</a>
+        <div class="glass-panel p-10 rounded-[3rem] text-center">
+            <div class="mb-6 inline-flex items-center justify-center w-20 h-20 bg-pink-100 rounded-full">
+                <i class="fa-solid fa-heart text-pink-400 text-4xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2 text-pink-500">Staff Login</h2>
+            <p class="text-pink-300 text-sm mb-8">Hello bestie! Enter the password ✨</p>
+            <input type="password" id="adminPass" placeholder="••••••••" class="w-full bg-white border-2 border-pink-100 rounded-2xl py-4 px-4 mb-4 focus:outline-none focus:border-pink-300 text-center text-pink-600">
+            <button onclick="handleLogin()" class="w-full bg-pink-400 py-4 rounded-2xl font-bold text-white hover:bg-pink-500 transition btn-hover shadow-lg shadow-pink-200">Enter Dashboard 🌸</button>
+            <a href="index.html" class="block mt-6 text-pink-300 hover:text-pink-400 text-xs font-bold uppercase tracking-widest"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Library</a>
         </div>
     </div>
 
-    <!-- DASHBOARD UI (HIDDEN BY DEFAULT) -->
+    <!-- DASHBOARD UI -->
     <div id="adminDashboard" class="w-full max-w-6xl hidden">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-black italic">MUSICE<span class="text-blue-500">ID</span> ADMIN</h1>
-            <button onclick="location.reload()" class="text-red-500 font-bold text-xs uppercase tracking-widest">Logout</button>
-        </div>
+        <header class="flex justify-between items-center mb-8 w-full px-4">
+            <h1 class="text-3xl font-bold text-pink-500"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Musice<span class="text-purple-400">ID</span> Admin</h1>
+            <button onclick="location.reload()" class="bg-white border-2 border-pink-100 px-6 py-2 rounded-full text-pink-400 font-bold text-xs uppercase tracking-widest hover:bg-pink-50 transition">Logout 👋</button>
+        </header>
 
-        <div class="glass-panel p-8 rounded-[2.5rem] flex flex-col md:flex-row gap-8 h-[75vh]">
+        <div class="glass-panel p-8 rounded-[3rem] flex flex-col md:flex-row gap-8 min-h-[75vh]">
             <!-- ADD/EDIT FORM -->
-            <div class="w-full md:w-1/3 border-r border-white/10 pr-6">
-                <h2 id="formTitle" class="text-xl font-bold mb-6 text-blue-400">Add Song</h2>
+            <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-pink-100 pb-8 md:pb-0 md:pr-8">
+                <h2 id="formTitle" class="text-xl font-bold mb-6 text-purple-400 flex items-center"><i class="fa-solid fa-plus-circle mr-2"></i>Add New Song</h2>
                 <div class="space-y-4">
-                    <input type="text" id="songName" placeholder="Song Name" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white">
-                    <input type="text" id="songID" placeholder="Asset ID" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white">
-                    <input type="text" id="songImg" placeholder="Cover Image URL (Optional)" class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white">
-                    <button id="saveBtn" onclick="saveSong()" class="w-full bg-blue-600 py-4 rounded-xl font-bold hover:bg-blue-500 transition">Save Song</button>
-                    <button id="cancelBtn" onclick="resetForm()" class="hidden w-full bg-white/10 py-2 rounded-xl text-xs">Cancel Edit</button>
+                    <div>
+                        <label class="text-xs font-bold text-pink-300 ml-2 uppercase">Song Title</label>
+                        <input type="text" id="songName" placeholder="My Cute Melody" class="w-full bg-white border-2 border-pink-50 rounded-2xl py-3 px-4 text-pink-600 focus:outline-none focus:border-pink-300">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-pink-300 ml-2 uppercase">Asset ID</label>
+                        <input type="text" id="songID" placeholder="12345678" class="w-full bg-white border-2 border-pink-50 rounded-2xl py-3 px-4 text-pink-600 focus:outline-none focus:border-pink-300">
+                    </div>
+                    
+                    <!-- IMAGE UPLOAD AREA -->
+                    <div>
+                        <label class="text-xs font-bold text-pink-300 ml-2 uppercase">Song Cover</label>
+                        <div onclick="document.getElementById('fileInput').click()" class="upload-box w-full h-32 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
+                            <img id="imgPreview" class="absolute inset-0 w-full h-full object-cover hidden">
+                            <div id="uploadPlaceholder" class="flex flex-col items-center">
+                                <i class="fa-solid fa-cloud-arrow-up text-pink-300 text-2xl mb-1"></i>
+                                <span class="text-[10px] text-pink-300 font-bold">CLICK TO UPLOAD</span>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+                    </div>
+                    
+                    <button id="saveBtn" onclick="saveSong()" class="w-full bg-pink-400 py-4 rounded-2xl font-bold text-white hover:bg-pink-500 transition btn-hover shadow-lg shadow-pink-100">Save to Library ✨</button>
+                    <button id="cancelBtn" onclick="resetForm()" class="hidden w-full bg-purple-50 text-purple-400 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Cancel Editing</button>
                 </div>
             </div>
 
             <!-- DATA LIST -->
             <div class="flex-grow flex flex-col overflow-hidden">
-                <h2 class="text-xl font-bold mb-6">Database Entries</h2>
-                <div id="adminSongList" class="admin-list flex-grow overflow-y-auto space-y-3 pr-2">
-                    <!-- Song Items -->
-                </div>
+                <h2 class="text-xl font-bold mb-6 text-pink-400 flex items-center"><i class="fa-solid fa-cloud mr-2"></i>Database Entries</h2>
+                <div id="adminSongList" class="admin-list flex-grow overflow-y-auto space-y-3 pr-2"></div>
             </div>
         </div>
     </div>
@@ -63,48 +114,70 @@
         const API_URL = "https://song-id-v3f2.onrender.com";
         let allSongs = [];
         let editModeId = null;
+        let base64Image = ""; // Holds the image string
+        const defaultImg = "https://i.pinimg.com/736x/68/57/7a/68577aafbdc23a3dd61f89b57601d26f.jpg";
 
         async function handleLogin() {
             const pass = document.getElementById('adminPass').value;
-            const res = await fetch(`${API_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: pass })
-            });
-            if(res.ok) {
-                document.getElementById('loginSection').classList.add('hidden');
-                document.getElementById('adminDashboard').classList.remove('hidden');
-                fetchAdminSongs();
-            } else {
-                alert("Unauthorized Access");
-            }
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: pass })
+                });
+                if(res.ok) {
+                    document.getElementById('loginSection').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    fetchAdminSongs();
+                } else { alert("Wrong password, bestie! 🎀"); }
+            } catch(e) { alert("Server Error!"); }
+        }
+
+        // Handle Image Selection and Convert to Base64
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64Image = e.target.result; // The string version of the image
+                const preview = document.getElementById('imgPreview');
+                preview.src = base64Image;
+                preview.classList.remove('hidden');
+                document.getElementById('uploadPlaceholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
         }
 
         async function fetchAdminSongs() {
-            const res = await fetch(`${API_URL}/songs`);
-            allSongs = await res.json();
-            const list = document.getElementById('adminSongList');
-            list.innerHTML = allSongs.map(song => `
-                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <img src="${song.img}" class="w-12 h-12 object-cover rounded-lg" onerror="this.src='https://i.pinimg.com/736x/68/57/7a/68577aafbdc23a3dd61f89b57601d26f.jpg'">
-                    <div class="flex-grow">
-                        <p class="font-bold text-sm">${song.name}</p>
-                        <p class="text-[10px] text-gray-500 font-mono">${song.song_id_string}</p>
+            try {
+                const res = await fetch(`${API_URL}/songs`);
+                allSongs = await res.json();
+                const list = document.getElementById('adminSongList');
+                list.innerHTML = allSongs.map(song => `
+                    <div class="flex items-center gap-4 bg-white/50 p-4 rounded-3xl border-2 border-pink-50 hover:border-pink-200 transition-all">
+                        <img src="${song.img || defaultImg}" class="w-14 h-14 object-cover rounded-2xl shadow-sm">
+                        <div class="flex-grow overflow-hidden">
+                            <p class="font-bold text-pink-600 text-sm truncate">${song.name}</p>
+                            <p class="text-[10px] text-purple-300 font-bold uppercase tracking-widest">ID: ${song.song_id_string}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editSong('${song.song_id_string}')" class="w-10 h-10 bg-purple-100 text-purple-400 rounded-full flex items-center justify-center hover:bg-purple-200 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="deleteSong('${song.song_id_string}')" class="w-10 h-10 bg-pink-100 text-pink-400 rounded-full flex items-center justify-center hover:bg-pink-200 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="editSong('${song.song_id_string}')" class="p-2 bg-blue-500/20 text-blue-400 rounded-lg"><i class="fa-solid fa-pen text-xs"></i></button>
-                        <button onclick="deleteSong('${song.song_id_string}')" class="p-2 bg-red-500/20 text-red-400 rounded-lg"><i class="fa-solid fa-trash text-xs"></i></button>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch(e) { console.error(e); }
         }
 
         async function saveSong() {
             const name = document.getElementById('songName').value;
             const song_id_string = document.getElementById('songID').value;
-            const img = document.getElementById('songImg').value || "https://i.pinimg.com/736x/68/57/7a/68577aafbdc23a3dd61f89b57601d26f.jpg";
+            
+            // Use selected image, or keep old image if editing and no new one selected, or use default
+            const imgToSave = base64Image || (editModeId ? allSongs.find(s => s.song_id_string === editModeId).img : defaultImg);
 
-            if(!name || !song_id_string) return alert("Missing Info");
+            if(!name || !song_id_string) return alert("Oops! Fill the title and ID first! 🌸");
 
             const method = editModeId ? 'PUT' : 'POST';
             const url = editModeId ? `${API_URL}/songs/${editModeId}` : `${API_URL}/songs`;
@@ -112,20 +185,14 @@
             const res = await fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, song_id_string, img })
+                body: JSON.stringify({ name, song_id_string, img: imgToSave })
             });
 
-            if(res.ok) {
-                resetForm();
-                fetchAdminSongs();
-            } else {
-                const err = await res.json();
-                alert(err.detail || "Error saving song");
-            }
+            if(res.ok) { resetForm(); fetchAdminSongs(); }
         }
 
         async function deleteSong(id) {
-            if(!confirm("Delete this song?")) return;
+            if(!confirm("Are you sure you want to delete this melody? 🎀")) return;
             await fetch(`${API_URL}/songs/${id}`, { method: 'DELETE' });
             fetchAdminSongs();
         }
@@ -135,22 +202,32 @@
             editModeId = id;
             document.getElementById('songName').value = song.name;
             document.getElementById('songID').value = song.song_id_string;
-            document.getElementById('songID').disabled = true; // Cannot change ID during edit
-            document.getElementById('songImg').value = song.img;
-            document.getElementById('formTitle').innerText = "Edit Song";
-            document.getElementById('saveBtn').innerText = "Update Entry";
+            document.getElementById('songID').disabled = true; 
+            
+            // Show the existing image in the preview box
+            const preview = document.getElementById('imgPreview');
+            preview.src = song.img || defaultImg;
+            preview.classList.remove('hidden');
+            document.getElementById('uploadPlaceholder').classList.add('hidden');
+            base64Image = song.img; // Set current image as the base for update
+
+            document.getElementById('formTitle').innerHTML = "<i class='fa-solid fa-pen-nib mr-2'></i>Edit Melody";
+            document.getElementById('saveBtn').innerText = "Update Melody 🌸";
             document.getElementById('cancelBtn').classList.remove('hidden');
         }
 
         function resetForm() {
             editModeId = null;
+            base64Image = "";
             document.getElementById('songName').value = "";
             document.getElementById('songID').value = "";
             document.getElementById('songID').disabled = false;
-            document.getElementById('songImg').value = "";
-            document.getElementById('formTitle').innerText = "Add Song";
-            document.getElementById('saveBtn').innerText = "Save Song";
+            document.getElementById('imgPreview').classList.add('hidden');
+            document.getElementById('uploadPlaceholder').classList.remove('hidden');
+            document.getElementById('formTitle').innerHTML = "<i class='fa-solid fa-plus-circle mr-2'></i>Add New Song";
+            document.getElementById('saveBtn').innerText = "Save to Library ✨";
             document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('fileInput').value = "";
         }
     </script>
 </body>

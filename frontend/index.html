@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUSICE ID - Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        body { 
+            background-color: #020617; 
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            background: radial-gradient(circle at top right, #1e1b4b, #020617); 
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .view-active { background: #1e293b !important; color: #3b82f6 !important; border-color: rgba(59, 130, 246, 0.3) !important; }
+        .song-card { transition: all 0.3s ease; }
+        .song-card:hover { border-color: rgba(59, 130, 246, 0.4); background: rgba(255, 255, 255, 0.05); }
+        
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #3b82f6; color: #fff; text-align: center;
+            border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px;
+            transform: translateX(-50%); font-weight: 700; opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+    </style>
+</head>
+<body>
+    <div id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-message">Copied!</span></div>
+
+    <header class="flex justify-between items-center px-6 md:px-10 py-6">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="location.href='index.html'">
+            <span class="font-black text-xl tracking-tighter uppercase italic text-white">Musice<span class="text-blue-500">ID</span></span>
+        </div>
+        <a href="admin.html" class="px-5 py-2 glass-panel rounded-xl flex items-center justify-center hover:bg-white/10 transition text-sm font-bold gap-2">
+            <i class="fa-solid fa-user-shield text-blue-400"></i> Admin Access
+        </a>
+    </header>
+
+    <section class="flex flex-col items-center pt-8 px-6 text-center">
+        <h1 class="text-5xl md:text-7xl font-black mb-8 uppercase text-white tracking-tighter">Musice <span class="text-blue-500">ID</span></h1>
+        <div class="relative w-full max-w-2xl mx-auto mb-12">
+            <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
+            <input type="text" id="songSearch" oninput="searchSongs()" placeholder="Search library by name or ID..." 
+                class="bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 w-full text-white text-lg focus:outline-none focus:border-blue-500 shadow-2xl">
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto w-full px-6 md:px-10 flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+        <div class="flex items-center gap-4">
+            <h2 class="text-2xl font-bold">Library</h2>
+            <span id="songCount" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest">0 Items</span>
+        </div>
+        <div class="glass-panel p-1 rounded-xl flex gap-1">
+            <button onclick="updateView('list')" id="listBtn" class="px-4 py-2 rounded-lg text-sm font-bold transition-all view-active"><i class="fa-solid fa-list"></i></button>
+            <button onclick="updateView('grid')" id="gridBtn" class="px-4 py-2 rounded-lg text-sm font-bold transition-all text-gray-400"><i class="fa-solid fa-grip"></i></button>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto w-full px-6 md:px-10 pb-20">
+        <div id="song-container" class="flex flex-col gap-3 max-w-5xl mx-auto"></div>
+    </main>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let allSongs = [];
+        let viewType = 'list';
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toast-message").innerText = msg;
+            toast.classList.add("show");
+            setTimeout(() => { toast.classList.remove("show"); }, 2000);
+        }
+
+        function copyID(e, id) {
+            e.stopPropagation();
+            navigator.clipboard.writeText(id).then(() => {
+                showToast("ID " + id + " copied!");
+            });
+        }
+
+        async function fetchSongs() {
+            try {
+                const res = await fetch(`${API_URL}/songs`);
+                allSongs = await res.json();
+                renderPublicList(allSongs);
+                document.getElementById('songCount').innerText = `${allSongs.length} Items`;
+            } catch (err) { console.error("Server connection failed"); }
+        }
+
+        function renderPublicList(songs) {
+            const container = document.getElementById('song-container');
+            if(viewType === 'list') {
+                container.className = "flex flex-col gap-3 max-w-5xl mx-auto";
+                container.innerHTML = songs.map(song => `
+                    <div class="glass-panel p-3 rounded-2xl flex items-center gap-6 song-card">
+                        <img src="${song.img}" class="w-16 h-16 rounded-xl object-cover">
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-white text-lg">${song.name}</h4>
+                            <p class="text-[10px] font-mono text-gray-500">ID: ${song.song_id_string}</p>
+                        </div>
+                        <button onclick="copyID(event, '${song.song_id_string}')" class="px-6 py-2 glass-panel rounded-xl text-xs font-bold hover:bg-blue-600 transition">Copy ID</button>
+                    </div>`).join('');
+            } else {
+                container.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6";
+                container.innerHTML = songs.map(song => `
+                    <div class="glass-panel p-4 rounded-[2rem] flex flex-col song-card">
+                        <img src="${song.img}" class="w-full aspect-square object-cover rounded-[1.5rem] mb-4">
+                        <h4 class="font-bold truncate text-white mb-4">${song.name}</h4>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-blue-400">ID: ${song.song_id_string}</span>
+                            <button onclick="copyID(event, '${song.song_id_string}')" class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center hover:bg-blue-600 transition"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>`).join('');
+            }
+        }
+
+        function updateView(type) {
+            viewType = type;
+            document.getElementById('listBtn').classList.toggle('view-active', type === 'list');
+            document.getElementById('gridBtn').classList.toggle('view-active', type === 'grid');
+            renderPublicList(allSongs);
+        }
+
+        function searchSongs() {
+            const q = document.getElementById('songSearch').value.toLowerCase();
+            renderPublicList(allSongs.filter(s => s.name.toLowerCase().includes(q) || s.song_id_string.includes(q)));
+        }
+
+        fetchSongs();
+    </script>
+</body>
+</html>

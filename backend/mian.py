@@ -1,26 +1,26 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from typing import List
+import os
 
 app = FastAPI(title="MusiceID API 🎀")
 
 # --- CORS SETTINGS ---
-# This allows your pink coquette frontend to talk to this backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # អាចប្តូរដាក់ URL Frontend របស់អ្នកដើម្បីសុវត្ថិភាព
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # --- MONGODB CONNECTION ---
-# Using your provided MongoDB string
+# បន្ថែម timeout ដើម្បីការពារការគាំង Server ពេល Connect យូរ
 MONGO_DETAILS = "mongodb+srv://sainicc01_db_user:wPKh8kwhDsU9PyBb@cluster0.y25sbxx.mongodb.net/?appName=Cluster0"
 
-client = AsyncIOMotorClient(MONGO_DETAILS)
+client = AsyncIOMotorClient(MONGO_DETAILS, serverSelectionTimeoutMS=5000)
 database = client.musice_db
 song_collection = database.get_collection("songs")
 
@@ -28,12 +28,12 @@ song_collection = database.get_collection("songs")
 class SongSchema(BaseModel):
     song_id_string: str
     name: str
-    img: str  # This handles both URLs and Base64 Uploaded images
+    img: str  # Handles URLs and Base64
 
 class LoginSchema(BaseModel):
     password: str
 
-# Helper to format MongoDB data for the frontend
+# Helper to format MongoDB data
 def song_helper(song) -> dict:
     return {
         "song_id_string": str(song.get("song_id_string", "")),
@@ -43,24 +43,30 @@ def song_helper(song) -> dict:
 
 # --- ROUTES ---
 
-# 1. Health Check (Required for Render to show "Live")
+# 1. Health Check (ចំណុចសំខាន់សម្រាប់ UptimeRobot)
 @app.get("/")
 async def root():
+    try:
+        # បញ្ជាក់ថា Database ក៏នៅដើរដែរ
+        await client.admin.command('ping')
+        db_status = "connected ✨"
+    except:
+        db_status = "offline ❌"
+        
     return {
         "status": "online", 
-        "message": "MusiceID API is running beautifully ✨",
-        "hint": "Check /songs to see the library!"
+        "database": db_status,
+        "message": "MusiceID API is running beautifully ✨"
     }
 
 # 2. Admin Login
 @app.post("/login")
 async def login(data: LoginSchema):
-    # Your secret password is "1"
     if data.password == "1":
         return {"message": "Login successful, bestie! 🎀"}
     raise HTTPException(status_code=401, detail="Wrong password! 🌸")
 
-# 3. Get All Songs (Library View)
+# 3. Get All Songs
 @app.get("/songs", response_model=List[SongSchema])
 async def get_songs():
     songs = []
@@ -68,10 +74,9 @@ async def get_songs():
         songs.append(song_helper(song))
     return songs
 
-# 4. Add New Song (Admin Only)
+# 4. Add New Song
 @app.post("/songs")
 async def add_song(song: SongSchema):
-    # Check if ID already exists
     existing = await song_collection.find_one({"song_id_string": song.song_id_string})
     if existing:
         raise HTTPException(status_code=400, detail="This ID is already in the library! 🎀")
@@ -80,7 +85,7 @@ async def add_song(song: SongSchema):
     await song_collection.insert_one(song_data)
     return {"message": "Song added successfully ✨"}
 
-# 5. Update Existing Song (Admin Only)
+# 5. Update Existing Song
 @app.put("/songs/{song_id_string}")
 async def update_song(song_id_string: str, updated_data: SongSchema):
     update_dict = updated_data.model_dump()
@@ -91,10 +96,13 @@ async def update_song(song_id_string: str, updated_data: SongSchema):
         return {"message": "Melody updated! 🌸"}
     raise HTTPException(status_code=404, detail="Song not found")
 
-# 6. Delete Song (Admin Only)
+# 6. Delete Song
 @app.delete("/songs/{song_id_string}")
 async def delete_song(song_id_string: str):
     delete_result = await song_collection.delete_one({"song_id_string": song_id_string})
     if delete_result.deleted_count == 1:
         return {"message": "Melody deleted from library 👋"}
     raise HTTPException(status_code=404, detail="Song not found")
+
+# --- RUNNER ---
+# សម្រាប់ Render អ្នកមិនចាំបាច់ដាក់ app.run ទេ ព្រោះគេប្រើ gunicorn/uvicorn ក្នុង Start Command
